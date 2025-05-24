@@ -1,0 +1,78 @@
+from openai import OpenAI
+from dotenv import load_dotenv
+import os
+from typing import List
+import numpy as np
+import faiss
+
+load_dotenv()
+API_KEY = os.getenv("OPENAI_API_KEY")
+
+if not API_KEY:
+    raise ValueError("OPENAI_API_KEY not found in .env file!")
+
+client = OpenAI(api_key=API_KEY)
+
+def get_embeddings(text: str) -> np.ndarray:
+    response = client.embeddings.create(
+        input=text,
+        model="text-embedding-3-small"
+    )
+
+    vector = np.array(response.data[0].embedding)
+
+    return vector / np.linalg.norm(vector)
+
+
+def read_txt(path: str) -> List[np.ndarray]:
+    with open(path, "r", encoding="utf-8") as f:
+        return [line.strip() for line in f if line.strip()]
+    
+
+def make_query(query: str, texts: List[str]):
+    introduction = "Use the below articles to answer the subsequent question."
+    question = f"\n\nQuestion: {query}"
+    articles = "\n\n".join([f"Source #{i+1}: {text}" for i, text in enumerate(texts, start=1)])
+    return f"{introduction}\n\n{articles}{question}"
+
+def main():
+    dimension = 1536
+
+    index = faiss.IndexFlatIP(dimension)
+
+    texts = read_txt("paragraphs.txt")
+    embeddings = np.load("embeddings.npy")
+
+    index.add(np.array(embeddings))
+
+    #user_input = input("You: ")
+    user_input = "What helps octopuses camouflage?"
+    user_input_embedding = get_embeddings(user_input)
+
+    num_match = 3
+    results = index.search(np.expand_dims(user_input_embedding, axis=0), num_match)
+
+    text_for_gpt = []
+    print(f"\n-> Top {num_match} Matches: ")
+    for i, idx in enumerate(results[1][0], start=1):
+        print(f'[{i}] "{texts[idx]}"')
+        text_for_gpt.append(texts[idx])
+    print()
+
+    print("Sending results to GPT-4o...")
+
+    query = make_query(user_input, text_for_gpt)
+
+    model_name = "gpt-4o-mini"
+
+    response = client.chat.completions.create(
+        model=model_name,
+        messages=[
+            {"role": "user", "content": query}
+        ]
+    )
+
+    print(f"Assistant: {response.choices[0].message.content}")
+
+if __name__ == "__main__":
+    main()
