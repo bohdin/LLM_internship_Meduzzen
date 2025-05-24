@@ -3,9 +3,11 @@
 ## Results
 
 Work screenshot
+
 ![cli_screenshot](screenshots/case_1.png)
 
 Logs screenshot
+
 ![logs screenshot](screenshots/log.png)
 
 ## Features
