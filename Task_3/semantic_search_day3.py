@@ -14,6 +14,15 @@ if not API_KEY:
 client = OpenAI(api_key=API_KEY)
 
 def get_embeddings(text: str) -> np.ndarray:
+    """
+    Generate normalized embedding vector from input text
+
+    Args:
+        text (str): Text to embed
+
+    Returns:
+        np.ndarray: A normalized NumPy array of text embedding
+    """
     response = client.embeddings.create(
         input=text,
         model="text-embedding-3-small"
@@ -24,12 +33,31 @@ def get_embeddings(text: str) -> np.ndarray:
     return vector / np.linalg.norm(vector)
 
 
-def read_txt(path: str) -> List[np.ndarray]:
+def read_txt(path: str) -> List[str]:
+    """
+    Read a .txt file and return its lines
+
+    Args:
+        path (str): Path to the text file
+
+    Returns:
+        List[str]: A list of non-empty lines
+    """
     with open(path, "r", encoding="utf-8") as f:
         return [line.strip() for line in f if line.strip()]
     
 
-def make_query(query: str, texts: List[str]):
+def make_query(query: str, texts: List[str]) -> str:
+    """
+    Generate a GPT query prompt using an introduction, source articles, and a user question
+
+    Args:
+        query (str): The user's input question
+        texts (List[str]): A list of relevant text passages from semantic search
+
+    Returns:
+        str: A formatted prompt string to send to GPT, including sources and instructions for citation
+    """
     introduction = "Use the below articles to answer the subsequent question.\n" + \
         "Cite your sources explicitly using the format 'According to Source #N'. For example: 'According to Source #2, ...'\n" + \
         "Your answer should be a consice summary, using information from the most relevant sources"
@@ -44,10 +72,14 @@ def main():
     index = faiss.IndexFlatIP(dimension)
 
     texts = read_txt("paragraphs.txt")
+    if os.path.exists("embeddings.npy"):
+        embeddings = np.load("embeddings.npy")
+    else:
+        embeddings = [get_embeddings(text) for text in texts]
+        np.save("embeddings.npy", embeddings)
+
     embeddings = [get_embeddings(text) for text in texts]
     
-    #embeddings = np.load("embeddings.npy") # For test
-
     index.add(np.array(embeddings))
 
     while True:
@@ -89,7 +121,14 @@ def main():
         save_log_markdown(user_input, response.choices[0].message.content)
 
 
-def save_log_markdown(user_input: str, gpt_response: str):
+def save_log_markdown(user_input: str, gpt_response: str) -> None:
+    """
+    Log a question and GPT answer to a Markdown file
+
+    Args:
+        user_input (str): The user's input question
+        gpt_response (str): The GPT-generated response
+    """
     os.makedirs("logs", exist_ok=True)
 
     file_path = "logs/chat_log.md"
