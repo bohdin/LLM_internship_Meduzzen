@@ -30,9 +30,12 @@ def read_txt(path: str) -> List[np.ndarray]:
     
 
 def make_query(query: str, texts: List[str]):
-    introduction = "Use the below articles to answer the subsequent question."
+    introduction = "Use the below articles to answer the subsequent question.\n" + \
+        "Cite your sources explicitly using the format 'According to Source #N'. For example: 'According to Source #2, ...'\n" + \
+        "Your answer should be a consice summary, using information from the most relevant sources"
+    
     question = f"\n\nQuestion: {query}"
-    articles = "\n\n".join([f"Source #{i+1}: {text}" for i, text in enumerate(texts, start=1)])
+    articles = "\n\n".join([f"Source #{i}: {text}" for i, text in enumerate(texts, start=1)])
     return f"{introduction}\n\n{articles}{question}"
 
 def main():
@@ -41,38 +44,60 @@ def main():
     index = faiss.IndexFlatIP(dimension)
 
     texts = read_txt("paragraphs.txt")
-    embeddings = np.load("embeddings.npy")
+    embeddings = [get_embeddings(text) for text in texts]
+    
+    #embeddings = np.load("embeddings.npy") # For test
 
     index.add(np.array(embeddings))
 
-    #user_input = input("You: ")
-    user_input = "What helps octopuses camouflage?"
-    user_input_embedding = get_embeddings(user_input)
+    while True:
 
-    num_match = 3
-    results = index.search(np.expand_dims(user_input_embedding, axis=0), num_match)
+        user_input = input("You: ")
 
-    text_for_gpt = []
-    print(f"\n-> Top {num_match} Matches: ")
-    for i, idx in enumerate(results[1][0], start=1):
-        print(f'[{i}] "{texts[idx]}"')
-        text_for_gpt.append(texts[idx])
-    print()
+        if user_input.lower() in ["quit", "exit"]:
+            print("Goodbye!")
+            break  
 
-    print("Sending results to GPT-4o...")
+        user_input_embedding = get_embeddings(user_input)
 
-    query = make_query(user_input, text_for_gpt)
+        num_match = 3
+        results = index.search(np.expand_dims(user_input_embedding, axis=0), num_match)
 
-    model_name = "gpt-4o-mini"
+        text_for_gpt = []
+        print(f"\n-> Top {num_match} Matches: ")
+        for i, idx in enumerate(results[1][0], start=1):
+            print(f'[{i}] "{texts[idx]}"')
+            text_for_gpt.append(texts[idx])
+        print()
 
-    response = client.chat.completions.create(
-        model=model_name,
-        messages=[
-            {"role": "user", "content": query}
-        ]
-    )
+        print("Sending results to GPT-4o...")
 
-    print(f"Assistant: {response.choices[0].message.content}")
+        query = make_query(user_input, text_for_gpt)
+
+        model_name = "gpt-4o"
+
+        response = client.chat.completions.create(
+            model=model_name,
+            messages=[
+                {"role": "user", "content": query}
+            ]
+        )
+
+
+        print(f"Assistant: {response.choices[0].message.content}")
+
+        save_log_markdown(user_input, response.choices[0].message.content)
+
+
+def save_log_markdown(user_input: str, gpt_response: str):
+    os.makedirs("logs", exist_ok=True)
+
+    file_path = "logs/chat_log.md"
+
+    with open(file_path, "a", encoding="utf-8") as f:
+        f.write(f"**User query:** {user_input}\n")
+        f.write(f"**GPT answer:** {gpt_response}\n\n")
+
 
 if __name__ == "__main__":
     main()
