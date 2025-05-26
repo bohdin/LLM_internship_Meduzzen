@@ -4,16 +4,16 @@
 
 --mode flag for different GPT tasks:
 
-![cli_screenshot](screenshots/case_1.png)
-![cli_screenshot](screenshots/case_2.png)
+![cli_screenshot](screenshots/cli_1.png)
+![cli_screenshot](screenshots/cli_2.png)
 
 Multiple files:
 
-![cli_screenshot](screenshots/case_3.png)
+![cli_screenshot](screenshots/cli_3.png)
 
 --mode 'custom' for retrying different custom prompts:
 
-![cli_screenshot](screenshots/case_4.png)
+![cli_screenshot](screenshots/cli_4.png)
 
 Logs screenshot:
 
@@ -53,7 +53,7 @@ From the project root:
 python Task_4/semantic_search_day4.py
 ```
 
-Or for different mode
+Or for different mode:
 
 Summary mode (default):
 
