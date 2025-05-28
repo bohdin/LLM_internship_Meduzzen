@@ -117,7 +117,7 @@ def main():
                 tools=tools
             )
 
-        print(f"Assistant: {response.output_text}")
+        print(f"\nAssistant: {response.output_text}", end='\n\n')
         
 
 def call_function(name: str, args: Dict[str, Union[str, float]]) -> Union[str, float]:
