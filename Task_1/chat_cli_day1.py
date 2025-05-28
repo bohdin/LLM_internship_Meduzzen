@@ -33,7 +33,6 @@ async def main():
     while True:
         user_input = console.input("[blue]You:[/] ")
 
-        
         if user_input.lower() in ["quit", "exit"]:
             session.save_to_json()
             print("Goodbye!")
