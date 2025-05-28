@@ -1,12 +1,13 @@
-from openai import OpenAI
-from dotenv import load_dotenv
-import os
 import argparse
 import json
+import os
 import random
-import wikipedia
+from datetime import datetime, timezone
 from typing import Dict, Union
-from datetime import datetime
+
+import wikipedia
+from dotenv import load_dotenv
+from openai import OpenAI
 
 load_dotenv()
 API_KEY = os.getenv("OPENAI_API_KEY")
@@ -119,7 +120,6 @@ def main():
         print(f"Assistant: {response.output_text}")
         
 
-
 def call_function(name: str, args: Dict[str, Union[str, float]]) -> Union[str, float]:
     """
     Calls the appropriate function based on the given function name and arguments
@@ -193,22 +193,24 @@ def save_logs(name: str, args: Dict[str, Union[str, float]]) -> None:
     log_data = {
         "function_name": name,
         "args": args,
-        "timestamp": datetime.now().isoformat()
+        "timestamp": datetime.now(timezone.utc).isoformat()
     }
 
     current_date = datetime.now().strftime("%Y-%m-%d")
     filename = f"logs/{current_date}.json"
 
+    data = []
+
     if os.path.exists(filename):
         with open(filename, "r", encoding="utf-8") as f:
             try:
-                data = json.load(f)
-                if not isinstance(data, list):
-                    data = [data]
-            except json.JSONDecodeError:
-                data = []
-    else:
-        data = []
+                existing_data = json.load(f)
+                if isinstance(existing_data, list):
+                    data += existing_data
+                else:
+                    data.append(existing_data)
+            except json.JSONDecodeError: # if file empty
+                pass
 
     data.append(log_data)
 

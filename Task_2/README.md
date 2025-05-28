@@ -1,15 +1,5 @@
 # GPT-4o CLI Chat With Tool Colling
 
-## Results
-
-Work screenshot
-
-![cli_screenshot](screenshots/case_1.png)
-
-Logs screenshot
-
-![logs screenshot](screenshots/log.png)
-
 ## Features
 
 - **Multiple Tools**: GPT automatically choose between all tools (math, weather, or wiki)
@@ -52,3 +42,14 @@ python tool_assistant_day2.py -prompt "Your initial system prompt"
 
 All function calls are logged automatically in the logs/ folder:
 - **JSON logs**: Structured data in `logs/YYYY-MM-DD.json`
+
+
+## Results
+
+Work screenshot
+
+![cli_screenshot](screenshots/case_1.png)
+
+Logs screenshot
+
+![logs screenshot](screenshots/log.png)
