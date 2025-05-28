@@ -1,13 +1,15 @@
-from dotenv import load_dotenv
-import os
-import asyncio
-import openai
-from openai import AsyncOpenAI
-from ChatSession import ChatSession
 import argparse
+import asyncio
+import os
+
+import openai
+from dotenv import load_dotenv
+from openai import AsyncOpenAI
 from rich.console import Console
 from rich.live import Live
 from rich.text import Text
+
+from ChatSession import ChatSession
 
 load_dotenv()
 API_KEY = os.getenv("OPENAI_API_KEY")
@@ -71,4 +73,3 @@ async def main():
 
 if __name__ == "__main__":
     asyncio.run(main())
-    

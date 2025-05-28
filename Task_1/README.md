@@ -1,9 +1,4 @@
 # Multi-Turn GPT-4o CLI Chat with Streaming, Token Counting & Logging
-Work screenshot
-![cli screenshot 1](screenshots/case_1.png)
-![cli screenshot 2](screenshots/case_2.png)
-Logs screenshot
-![logs screenshot](screenshots/log.png)
 
 ## Features
 
@@ -36,7 +31,7 @@ python chat_cli_day1.py
 From the project root:
 
 ```bash
-python Task_1/main.py
+python Task_1/chat_cli_day1.py
 ```
 
 You can also start with a system prompt directly from the command line:
@@ -48,3 +43,15 @@ python chat_cli_day1.py -prompt "Your initial system prompt"
 
 All conversations are saved automatically in the `logs/` folder:
 - **JSON logs**: Structured data in `logs/YYYY-MM-DD.json`
+
+
+## Results
+
+Work screenshot
+
+![cli screenshot 1](screenshots/case_1.png)
+![cli screenshot 2](screenshots/case_2.png)
+
+Logs screenshot
+
+![logs screenshot](screenshots/log.png)
