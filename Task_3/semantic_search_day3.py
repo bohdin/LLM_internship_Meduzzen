@@ -1,5 +1,5 @@
 import os
-from typing import List
+from typing import List, Tuple
 
 import faiss
 import numpy as np
@@ -34,18 +34,18 @@ def get_embeddings(text: str) -> np.ndarray:
     return vector / np.linalg.norm(vector)
 
 
-def read_txt(path: str) -> List[str]:
+def read_txt(path: str) -> List[Tuple[str, str]]:
     """
-    Read a .txt file and return its lines
+    Read a .txt file and return its lines with source number
 
     Args:
         path (str): Path to the text file
 
     Returns:
-        List[str]: A list of non-empty lines
+        List[Tuple[str, str]]: A list of (source ID, line) pairs
     """
     with open(path, "r", encoding="utf-8") as f:
-        return [line.strip() for line in f if line.strip()]
+        return [(f"Source #{i}", line.strip()) for i, line in enumerate(f, start=1) if line.strip()]
     
 
 def make_query(query: str, texts: List[str]) -> str:
@@ -61,10 +61,10 @@ def make_query(query: str, texts: List[str]) -> str:
     """
     introduction = "Use the below articles to answer the subsequent question.\n" + \
         "Cite your sources explicitly using the format 'According to Source #N'. For example: 'According to Source #2, ...'\n" + \
-        "Your answer should be a consice summary, using information from the most relevant sources"
+        "Your answer should be a concise summary, using information from the most relevant sources"
     
     question = f"\n\nQuestion: {query}"
-    articles = "\n\n".join([f"Source #{i}: {text}" for i, text in enumerate(texts, start=1)])
+    articles = "\n\n".join([text for text in texts])
     return f"{introduction}\n\n{articles}{question}"
 
 
@@ -77,7 +77,7 @@ def main():
     if os.path.exists("embeddings.npy"):
         embeddings = np.load("embeddings.npy")
     else:
-        embeddings = [get_embeddings(text) for text in texts]
+        embeddings = [get_embeddings(text[1]) for text in texts]
         np.save("embeddings.npy", embeddings)
   
     index.add(np.array(embeddings))
@@ -97,9 +97,10 @@ def main():
 
         text_for_gpt = []
         print(f"\n-> Top {num_match} Matches: ")
-        for i, idx in enumerate(results[1][0], start=1):
-            print(f'[{i}] "{texts[idx]}"')
-            text_for_gpt.append(texts[idx])
+        for idx in results[1][0]:
+            text = f'[{texts[idx][0]}]: "{texts[idx][1]}"'
+            print(text)
+            text_for_gpt.append(text)
         print()
 
         print("Sending results to GPT-4o...")
