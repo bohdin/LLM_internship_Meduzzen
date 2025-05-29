@@ -39,8 +39,7 @@ class ChatSession:
             int: The number of tokens
         """
         encoding = tiktoken.get_encoding("o200k_base")
-        tokens = 3 # approximate number of extra tokens example for role
-        tokens += len(encoding.encode(content))
+        tokens = len(encoding.encode(content))
         return tokens
 
     def count_tokens(self) -> int:
@@ -51,13 +50,10 @@ class ChatSession:
             int: Total number of tokens
         """
         encoding = tiktoken.get_encoding("o200k_base")
-        tokens_per_message = 3 # approximate number of extra tokens example for role
         
         tokens = 0
         for message in self.messages:
-            tokens += tokens_per_message
-            tokens += len(encoding.encode(message["content"]))
-        tokens += 3 # every reply is primed with <|start|>assistant<|message|>
+            tokens += message["tokens_used"]
         return tokens
 
     def add_tokens(self, tokens: int) -> None:
