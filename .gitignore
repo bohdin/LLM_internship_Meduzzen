@@ -1,6 +1,7 @@
 .env
 gpt_env
 logs
+audio
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

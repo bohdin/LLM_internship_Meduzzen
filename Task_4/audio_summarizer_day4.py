@@ -81,32 +81,36 @@ def main():
                 while True:
                     new_prompt = input("Enter prompt for GPT (write 'default' for return default prompt): ")
                                 
-                    instructions = dict_gpt_task[mode] if new_prompt == "default" else new_prompt
+                    instructions = dict_gpt_task["summary"] if new_prompt == "default" else new_prompt
 
-                    response = client.responses.create(
+                    response = client.chat.completions.create(
                         model=model_name,
-                        instructions=instructions,
-                        input=transcription_input
+                        messages=[
+                            {"role": "system", "content": instructions},
+                            {"role": "user", "content": transcription_input}
+                        ]
                     )
 
-                    print(f"\n-> GPT Summary: {response.output_text}", end="\n\n")
+                    print(f"\n-> GPT Summary: {response.choices[0].message.content}", end="\n\n")
 
-                    transcripts_and_summaries_log(mode, instructions, transcription_input, response.output_text)
+                    transcripts_and_summaries_log(mode, instructions, transcription_input, response.choices[0].message.content)
 
                     again = input("\nTry another summarization prompts? (yes/not): ")
 
                     if again != "yes":
                         break
             else:
-                response = client.responses.create(
+                response = client.chat.completions.create(
                         model=model_name,
-                        instructions=instructions,
-                        input=transcription_input
+                        messages=[
+                            {"role": "system", "content": instructions},
+                            {"role": "user", "content": transcription_input}
+                        ]
                     )
                  
-                print(f"\n-> GPT Summary: {response.output_text}", end="\n\n")
+                print(f"\n-> GPT Summary: {response.choices[0].message.content}", end="\n\n")
 
-                transcripts_and_summaries_log(mode, instructions, transcription_input, response.output_text)
+                transcripts_and_summaries_log(mode, instructions, transcription_input, response.choices[0].message.content)
                  
 
 def transcripts_and_summaries_log(mode: str, prompt: str, transcript: str, summary: str) -> None:
@@ -129,19 +133,20 @@ def transcripts_and_summaries_log(mode: str, prompt: str, transcript: str, summa
     }
 
     current_date = datetime.now().strftime("%Y-%m-%d")
-    file_name = f"logs\{current_date}.json"
+    file_name = f"logs/{current_date}.json"
+
+    data = []
 
     if os.path.exists(file_name):
         with open(file_name, "r", encoding="utf-8") as f:
             try:
-                data = json.load(f)
-                if not isinstance(data, list):
-                    data = [data]
-            except json.JSONDecodeError:
-                data = []
-                
-    else:
-        data = []
+                existing_data = json.load(f)
+                if isinstance(existing_data, list):
+                    data += existing_data
+                else:
+                    data.append(existing_data)
+            except json.JSONDecodeError: # if file empty
+                pass
 
     data.append(log_data)
     

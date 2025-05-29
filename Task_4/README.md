@@ -1,24 +1,5 @@
 # Transcribe and Summarize Audio with Whisper + GPT-4o
 
-## Results
-
---mode flag for different GPT tasks:
-
-![cli_screenshot](screenshots/cli_1.png)
-![cli_screenshot](screenshots/cli_2.png)
-
-Multiple files:
-
-![cli_screenshot](screenshots/cli_3.png)
-
---mode 'custom' for retrying different custom prompts:
-
-![cli_screenshot](screenshots/cli_4.png)
-
-Logs screenshot:
-
-![logs screenshot](screenshots/log.png)
-
 ## Features
 
 - **Whisper API**: Transcribes audio files using `whisper-1`
@@ -44,13 +25,13 @@ pip install -r requirements.txt
 From the Task_4 directory:
 
 ```bash
-python semantic_search_day4.py
+python audio_summarizer_day4.py
 ```
 
 From the project root:
 
 ```bash
-python Task_4/semantic_search_day4.py
+python Task_4/audio_summarizer_day4.py
 ```
 
 Or for different mode:
@@ -58,28 +39,47 @@ Or for different mode:
 Summary mode (default):
 
 ```bash
-python semantic_search_day4.py --mode "summary"
+python audio_summarizer_day4.py --mode "summary"
 ```
 
 Extract keywords mode:
 
 ```bash
-python semantic_search_day4.py --mode "extract_keywords"
+python audio_summarizer_day4.py --mode "extract_keywords"
 ```
 
 Generate title mode:
 
 ```bash
-python semantic_search_day4.py --mode "generate_title"
+python audio_summarizer_day4.py --mode "generate_title"
 ```
 
 Custom prompt mode:
 
 ```bash
-python semantic_search_day4.py --mode "custom"
+python audio_summarizer_day4.py --mode "custom"
 ```
 
 ## Logs
 
 Transcripts & summaries are saved to a JSON  in the `logs/` folder:
 - **JSON logs**: Structured data in `logs/YYYY-MM-DD.json`
+
+## Results
+
+--mode flag for different GPT tasks:
+
+![cli_screenshot](screenshots/cli_1.png)
+![cli_screenshot](screenshots/cli_2.png)
+
+Multiple files:
+
+![cli_screenshot](screenshots/cli_3.png)
+
+--mode 'custom' for retrying different custom prompts:
+
+![cli_screenshot](screenshots/cli_4.png)
+
+Logs screenshot:
+
+![logs screenshot](screenshots/log.png)
