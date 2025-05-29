@@ -1,15 +1,5 @@
 # A Local Semantic Search Engine Using OpenAI Embeddings + GPT-4o Query Enhancement
 
-## Results
-
-Work screenshot
-
-![cli_screenshot](screenshots/case_1.png)
-
-Logs screenshot
-
-![logs screenshot](screenshots/log.png)
-
 ## Features
 
 - **OpenAI Embeddings**: Use OpenAI’s text-embedding-3-small API, normalize embeddings for cosine similarity
@@ -47,3 +37,13 @@ python Task_3/semantic_search_day3.py
 ## Logs
 
 All conversations are saved in a Markdown file at logs/chat_log.md
+
+## Results
+
+Work screenshot
+
+![cli_screenshot](screenshots/case_1.png)
+
+Logs screenshot
+
+![logs screenshot](screenshots/log.png)

@@ -1,9 +1,10 @@
-from openai import OpenAI
-from dotenv import load_dotenv
 import os
 from typing import List
-import numpy as np
+
 import faiss
+import numpy as np
+from dotenv import load_dotenv
+from openai import OpenAI
 
 load_dotenv()
 API_KEY = os.getenv("OPENAI_API_KEY")
@@ -66,6 +67,7 @@ def make_query(query: str, texts: List[str]) -> str:
     articles = "\n\n".join([f"Source #{i}: {text}" for i, text in enumerate(texts, start=1)])
     return f"{introduction}\n\n{articles}{question}"
 
+
 def main():
     dimension = 1536
 
@@ -77,9 +79,7 @@ def main():
     else:
         embeddings = [get_embeddings(text) for text in texts]
         np.save("embeddings.npy", embeddings)
-
-    embeddings = [get_embeddings(text) for text in texts]
-    
+  
     index.add(np.array(embeddings))
 
     while True:
@@ -116,7 +116,7 @@ def main():
         )
 
 
-        print(f"Assistant: {response.choices[0].message.content}")
+        print(f"Assistant: {response.choices[0].message.content}", end="\n\n")
 
         save_log_markdown(user_input, response.choices[0].message.content)
 
