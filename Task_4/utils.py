@@ -1,9 +1,9 @@
-from openai import OpenAI
-from dotenv import load_dotenv
-import os
-import argparse
 import json
+import os
 from datetime import datetime
+
+from openai import OpenAI
+
 
 def get_transcription(client: OpenAI, audio_path: str) -> str:
     """

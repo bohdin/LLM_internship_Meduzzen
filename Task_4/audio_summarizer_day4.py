@@ -1,10 +1,11 @@
-from openai import OpenAI
-from dotenv import load_dotenv
-import os
 import argparse
-import json
-from datetime import datetime
-from utils import get_transcription, transcripts_and_summaries_log, get_gpt_response
+import os
+
+from dotenv import load_dotenv
+from openai import OpenAI
+
+from utils import (get_gpt_response, get_transcription,
+                   transcripts_and_summaries_log)
 
 load_dotenv()
 API_KEY = os.getenv("OPENAI_API_KEY")
