@@ -1,22 +1,14 @@
 import os
 
 import numpy as np
-from dotenv import load_dotenv
 from openai import OpenAI
 
-load_dotenv()
-API_KEY = os.getenv("OPENAI_API_KEY")
-
-if not API_KEY:
-    raise ValueError("OPENAI_API_KEY not found in .env file!")
-
-client = OpenAI(api_key=API_KEY)
-
-def get_embeddings(text: str) -> np.ndarray:
+def get_embeddings(client: OpenAI, text: str) -> np.ndarray:
     """
     Generate normalized embedding vector from input text
 
     Args:
+        client (OpenAI): An initialized OpenAI client
         text (str): Text to embed
 
     Returns:
