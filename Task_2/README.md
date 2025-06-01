@@ -40,7 +40,7 @@ python tool_assistant_day2.py -prompt "Your initial system prompt"
 
 ## Logs
 
-All function calls are logged automatically in the logs/ folder:
+All function calls and chat session are logged automatically in the logs/ folder:
 - **JSON logs**: Structured data in `logs/YYYY-MM-DD.json`
 
 
