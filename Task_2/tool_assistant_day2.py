@@ -1,13 +1,11 @@
 import argparse
 import json
 import os
-import random
-from datetime import datetime, timezone
-from typing import Dict, Union
 
-import wikipedia
 from dotenv import load_dotenv
 from openai import OpenAI
+
+from utils import call_function, log_chat_session
 
 load_dotenv()
 API_KEY = os.getenv("OPENAI_API_KEY")
@@ -75,6 +73,9 @@ def main():
 
     input_messages = [{"role": "system", "content": system_prompt}] if system_prompt else []
 
+    if input_messages:
+        log_chat_session(input_messages[0])
+
     while True:
         user_input = input("You: ")
 
@@ -82,7 +83,9 @@ def main():
             print("Goodbye!")
             break  
         
-        input_messages.append({"role": "user", "content": user_input})
+        user_message = {"role": "user", "content": user_input}
+        input_messages.append(user_message)
+        log_chat_session(user_message)
 
         response = client.responses.create(
             model=model_name,
@@ -116,107 +119,14 @@ def main():
                 input=input_messages,
                 tools=tools
             )
+        
+        assistant_message = {"role": "assistant", "content": response.output_text}
+
+        input_messages.append(assistant_message)
+        log_chat_session(assistant_message)
 
         print(f"\nAssistant: {response.output_text}", end='\n\n')
         
-
-def call_function(name: str, args: Dict[str, Union[str, float]]) -> Union[str, float]:
-    """
-    Calls the appropriate function based on the given function name and arguments
-
-    Args:
-        name (str): The name of the function to call
-        args (Dict[str, Union[str, float]]): Arguments to pass to the function
-    
-    Returns:
-        Union[str, float]: The result returned by the called function
-    """
-    save_logs(name, args)
-
-    if name == "get_weather":
-        return get_weather(**args)
-    if name == "calculate_area_rectangle":
-        return calculate_area_rectangle(**args)
-    if name == "search_wikipedia":
-        return search_wikipedia(**args)
-
-def get_weather(location: str) -> float:
-    """
-    Returns fake temperature for the given location
-
-    Args:
-        location (str): The name of the city and country
-
-    Returns:
-        float: A random temperature between -20.0 and 20.0
-    """
-    return round(random.uniform(-20, 20), 1)
-
-def calculate_area_rectangle(height: float, width: float) -> float:
-    """
-    Calculate the area of a rectangle
-
-    Args:
-        height (float): Height of the rectangle
-        width (float): Width of the rectangle
-
-    Returns:
-        float: An area of rectangle
-    """
-    return height * width
-
-def search_wikipedia(query: str) -> str:
-    """
-    Search Wikipedia for a summary of the given query
-
-    Args:
-        query (str): Key words for searching
-
-    Returns:
-        str: A summary related to the query
-    """
-    try:
-        return wikipedia.summary(query, sentences = 2)
-    except wikipedia.exceptions.PageError:
-        return "Page not found"
-
-def save_logs(name: str, args: Dict[str, Union[str, float]]) -> None:
-    """
-    Log all function calls to a JSON file
-
-    Args:
-        name (str): The name of the function being logged
-        args (Dict[str, Union[str, float]]): Arguments passed to the function
-    """
-    os.makedirs("logs", exist_ok=True)
-
-    log_data = {
-        "function_name": name,
-        "args": args,
-        "timestamp": datetime.now(timezone.utc).isoformat()
-    }
-
-    current_date = datetime.now().strftime("%Y-%m-%d")
-    filename = f"logs/{current_date}.json"
-
-    data = []
-
-    if os.path.exists(filename):
-        with open(filename, "r", encoding="utf-8") as f:
-            try:
-                existing_data = json.load(f)
-                if isinstance(existing_data, list):
-                    data += existing_data
-                else:
-                    data.append(existing_data)
-            except json.JSONDecodeError: # if file empty
-                pass
-
-    data.append(log_data)
-
-    with open(filename, "w", encoding="utf-8") as f:
-        json.dump(data, f, indent=2)
-
 
 if __name__ == "__main__":
     main()
