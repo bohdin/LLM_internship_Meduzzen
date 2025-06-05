@@ -9,7 +9,8 @@ from rich.console import Console
 from rich.live import Live
 from rich.text import Text
 
-from ChatSession import ChatSession
+from chat_session import ChatSession
+from vector_store import VectorStore
 
 load_dotenv()
 API_KEY = os.getenv("OPENAI_API_KEY")
@@ -28,6 +29,7 @@ async def main():
     assistant_behavior = args.persona
     system_prompt = f"You are {assistant_behavior} assistant"
     session = ChatSession(prompt=system_prompt)
+    vectors = VectorStore()
 
     model_name = "gpt-4o"
 
@@ -36,10 +38,18 @@ async def main():
 
         if user_input.lower() == "/exit":
             session.save_to_json()
+            vectors.save()
             print("Goodbye!")
             break   
 
         try:
+            if user_input.lower() == "/update_kb_text":
+                console.print("[dim]Assistant:[/]  Please enter the knowledge text you'd like to store:")
+                user_text = console.input("[blue]User:[/] ")
+                await vectors.add_text(client, user_text)
+                continue
+
+
             session.add_message("user", user_input)
 
             stream = await client.chat.completions.create(
