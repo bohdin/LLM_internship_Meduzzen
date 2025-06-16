@@ -61,16 +61,34 @@ def main():
             stream = client.chat.completions.create(
                 model=MODEL_NAME,
                 messages=session.messages,
+                tools=tools,
                 stream=True
             )
 
+
             assistant_reply = ""
-            with Live(Text("Assistant is typing...", style="dim"), refresh_per_second=4, console=console) as live:
+            final_tool_calls = {}
+            with Live(Text("Assistant is typing...", style="dim"), refresh_per_second=10, console=console) as live:
                 for chunk in stream:
-                    if delta := chunk.choices[0].delta.content:
-                        assistant_reply += delta
-                        text = Text.assemble(("Assistant: ", "dim"), (assistant_reply, "default"))
-                        live.update(text)
+                    delta = chunk.choices[0].delta
+
+                    if delta.content:
+                        assistant_reply += delta.content
+                        live.update(Text.assemble(("Assistant: ", "dim"), (assistant_reply, "default")))
+                    
+                    if delta.tool_calls:
+                        for tool_call in delta.tool_calls:
+                            index = tool_call.index
+
+                            if index not in  final_tool_calls:
+                                final_tool_calls[index] = tool_call
+
+                            final_tool_calls[index].function.arguments += tool_call.function.arguments
+                            live.update(Text(f"Assistant is invoking function...", style="dim"))
+
+            for idx, tool_call in final_tool_calls.items():
+                console.print(f"\n[bold]Function call #{idx}:[/bold] {tool_call.function.name}")
+                console.print(f"Arguments: {tool_call.function.arguments}")
 
             session.add_message("assistant", assistant_reply)
 

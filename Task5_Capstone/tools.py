@@ -29,18 +29,19 @@ tools = [{
                     "type": "string",
                     "description": "The user's search question."
                 },
+
                 "top_k": {
-                    "type": "integer",
-                    "description": "Number of top results to return."
+                    "type": ["integer", "null"],
+                    "description": "Number of top results to return (optional). If don't mantion use null."
                 }
             },
-        "required": ["query"],
-        "additionalProperties": False
+            "required": ["query", "top_k"],
+            "additionalProperties": False
         },
-    "strict": True,  
-    },
-}
-]
+        "strict": True
+    }
+}]
+
 
 def call_function(name: str, args: dict[str, str | float]) -> str | float:
     """
