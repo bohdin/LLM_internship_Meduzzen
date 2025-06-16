@@ -1,37 +1,36 @@
 import argparse
-import asyncio
 import os
 
 import openai
 from dotenv import load_dotenv
-from openai import AsyncOpenAI
 from rich.console import Console
 from rich.live import Live
 from rich.text import Text
 
 from chat_session import ChatSession
 from vector_store import VectorStore
+from tools import tools, call_function
 
 load_dotenv()
 API_KEY = os.getenv("OPENAI_API_KEY")
+MODEL_NAME = os.getenv("MODEL")
 
 if not API_KEY:
     raise ValueError("OPENAI_API_KEY not found in .env file!")
 
-client = AsyncOpenAI(api_key=API_KEY)
+client = openai.OpenAI(api_key=API_KEY)
+
 parser = argparse.ArgumentParser()
 parser.add_argument("--persona", type=str)
 args = parser.parse_args()
 
 console = Console()
 
-async def main():
+def main():
     assistant_behavior = args.persona
     system_prompt = f"You are {assistant_behavior} assistant"
     session = ChatSession(prompt=system_prompt)
     vectors = VectorStore()
-
-    model_name = "gpt-4o"
 
     while True:
         user_input = console.input("[blue]You:[/] ")
@@ -46,21 +45,28 @@ async def main():
             if user_input.lower() == "/update_kb_text":
                 console.print("[dim]Assistant:[/]  Please enter the knowledge text you'd like to store:")
                 user_text = console.input("[blue]User:[/] ")
-                await vectors.add_text(client, user_text)
+                vectors.add_text(client, user_text)
                 continue
+
+            if user_input.lower() == "/update_kb_voice":
+                console.print("[dim]Assistant:[/]  Please enter name of audio file or path:")
+                user_audio = console.input("[blue]User:[/] ")
+                vectors.add_audio(client, user_audio)
+                continue
+                
 
 
             session.add_message("user", user_input)
 
-            stream = await client.chat.completions.create(
-                model=model_name,
+            stream = client.chat.completions.create(
+                model=MODEL_NAME,
                 messages=session.messages,
                 stream=True
             )
-            
+
             assistant_reply = ""
             with Live(Text("Assistant is typing...", style="dim"), refresh_per_second=4, console=console) as live:
-                async for chunk in stream:
+                for chunk in stream:
                     if delta := chunk.choices[0].delta.content:
                         assistant_reply += delta
                         text = Text.assemble(("Assistant: ", "dim"), (assistant_reply, "default"))
@@ -80,4 +86,4 @@ async def main():
             print("Problem with connection")
 
 if __name__ == "__main__":
-    asyncio.run(main())
+    main()
