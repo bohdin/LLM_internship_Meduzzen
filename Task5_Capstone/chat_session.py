@@ -1,5 +1,5 @@
 import json
-from datetime import datetime
+from datetime import datetime, timezone
 import os
 import tiktoken
 
@@ -8,7 +8,8 @@ class ChatSession:
     def __init__(self, prompt: str):
         self.total_tokens = 0
         self.messages = []
-        self.add_message("system", prompt)
+        if prompt is not None:
+            self.add_message("system", prompt)
 
     def add_message(self, role: str, content: str):
         """
@@ -22,7 +23,7 @@ class ChatSession:
             "role": role, 
             "content": content,
             "tokens_used": ChatSession.count_tokens_per_message(content),
-            "timestamp": datetime.now().isoformat()
+            "timestamp": datetime.now(timezone.utc).isoformat()
             })
 
     @staticmethod
@@ -37,8 +38,7 @@ class ChatSession:
             int: The number of tokens
         """
         encoding = tiktoken.get_encoding("o200k_base")
-        tokens = 3
-        tokens += len(encoding.encode(content))
+        tokens = len(encoding.encode(content))
         return tokens
 
     def count_tokens(self) -> int:
@@ -48,14 +48,9 @@ class ChatSession:
         Returns:
             int: Total number of tokens
         """
-        encoding = tiktoken.get_encoding("o200k_base")
-        tokens_per_message = 3
-        
         tokens = 0
         for message in self.messages:
-            tokens += tokens_per_message
-            tokens += len(encoding.encode(message["content"]))
-        tokens += 3
+            tokens += message["tokens_used"]
         return tokens
 
     def add_tokens(self, tokens: int):
@@ -67,7 +62,7 @@ class ChatSession:
         """
         self.total_tokens += tokens
 
-    def save_to_json(self):
+    def save_to_json(self) -> None:
         """
         Save the current session data to a JSON file
         """
@@ -81,21 +76,22 @@ class ChatSession:
         current_date = datetime.now().strftime("%Y-%m-%d")
         filename = f"logs/{current_date}.json"
 
+        data = []
+
         if os.path.exists(filename):
             with open(filename, "r", encoding="utf-8") as f:
                 try:
-                    data = json.load(f)
-                    if not isinstance(data, list):
-                        data = [data]
-                except json.JSONDecodeError:
-                    data = []
-        else:
-            data = []
+                    existing_data = json.load(f)
+                    if isinstance(existing_data, list):
+                        data += existing_data
+                    else:
+                        data.append(existing_data)
+                except json.JSONDecodeError: # if file empty
+                    pass
 
         data.append(log_data)
 
         with open(filename, "w", encoding="utf-8") as f:
-            json.dump(data, f, indent=2)
-
+            json.dump(data, f, indent=2) 
+            
         print(f"[Conversation saved to {filename}]")
-
