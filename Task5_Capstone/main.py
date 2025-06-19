@@ -6,9 +6,9 @@ from dotenv import load_dotenv
 from rich.console import Console
 
 from chat_session import ChatSession
-from vector_store import VectorStore
 from tools import tools
-from utils import stream_assistant_response, handle_tool_call
+from utils import handle_tool_call, stream_assistant_response
+from vector_store import VectorStore
 
 load_dotenv()
 API_KEY = os.getenv("OPENAI_API_KEY")

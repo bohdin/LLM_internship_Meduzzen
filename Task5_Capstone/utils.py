@@ -1,8 +1,10 @@
+import json
+
 from openai import OpenAI
 from rich.console import Console
-from tools import tools, call_function
-import json
+
 from chat_session import ChatSession
+from tools import call_function, tools
 
 
 def stream_assistant_response(
