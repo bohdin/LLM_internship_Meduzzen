@@ -18,9 +18,7 @@ def get_transcription(client: OpenAI, audio_path: str) -> str:
     """
     with open(audio_path, "rb") as audio_file:
         transcription = client.audio.transcriptions.create(
-            file=audio_file,
-            model="whisper-1",
-            response_format="verbose_json"
+            file=audio_file, model="whisper-1", response_format="verbose_json"
         )
 
         result = ""
@@ -32,7 +30,9 @@ def get_transcription(client: OpenAI, audio_path: str) -> str:
         return result
 
 
-def get_gpt_response(client: OpenAI, model_name: str, system_prompt: str, transcription: str) -> str:
+def get_gpt_response(
+    client: OpenAI, model_name: str, system_prompt: str, transcription: str
+) -> str:
     """
     Send a transcription to a GPT model with system instructions and return the response
 
@@ -46,17 +46,18 @@ def get_gpt_response(client: OpenAI, model_name: str, system_prompt: str, transc
         str: The response based on the system prompt and transcription
     """
     response = client.chat.completions.create(
-    model=model_name,
-    messages=[
-        {"role": "system", "content": system_prompt},
-        {"role": "user", "content": transcription}
-        ]
+        model=model_name,
+        messages=[
+            {"role": "system", "content": system_prompt},
+            {"role": "user", "content": transcription},
+        ],
     )
     return response.choices[0].message.content
 
 
-
-def transcripts_and_summaries_log(mode: str, prompt: str, transcript: str, summary: str) -> None:
+def transcripts_and_summaries_log(
+    mode: str, prompt: str, transcript: str, summary: str
+) -> None:
     """
     Save transcript, GPT prompt, and summary result to a JSON log file
 
@@ -72,7 +73,7 @@ def transcripts_and_summaries_log(mode: str, prompt: str, transcript: str, summa
         "mode": mode,
         "prompt": prompt,
         "transcript": transcript,
-        "summary": summary
+        "summary": summary,
     }
 
     current_date = datetime.now().strftime("%Y-%m-%d")
@@ -88,10 +89,10 @@ def transcripts_and_summaries_log(mode: str, prompt: str, transcript: str, summa
                     data += existing_data
                 else:
                     data.append(existing_data)
-            except json.JSONDecodeError: # if file empty
+            except json.JSONDecodeError:  # if file empty
                 pass
 
     data.append(log_data)
-    
+
     with open(file_name, "w", encoding="utf-8") as f:
-         json.dump(data, f, indent=2)
+        json.dump(data, f, indent=2)
