@@ -3,6 +3,8 @@ import os
 import openai
 from dotenv import load_dotenv
 
+from prompts import system_prompt_summarize
+from tools_list import tools
 from vector_store import VectorStore
 
 load_dotenv()
@@ -11,56 +13,6 @@ MODEL_NAME = os.getenv("MODEL")
 
 client = openai.OpenAI(api_key=API_KEY)
 vector_store = VectorStore()
-
-tools = [
-    {
-        "type": "function",
-        "function": {
-            "name": "semantic_search",
-            "description": "Search the most relevant information in the specified knowledge base, when the user asks questions.",
-            "parameters": {
-                "type": "object",
-                "properties": {
-                    "query": {
-                        "type": "string",
-                        "description": "The user's search question.",
-                    }
-                },
-                "required": ["query"],
-                "additionalProperties": False,
-            },
-            "strict": True,
-        },
-    },
-    {
-        "type": "function",
-        "function": {
-            "name": "summarize_session",
-            "description": "Summarize the conversation between the assistant and the user.",
-            "parameters": {
-                "type": "object",
-                "properties": {
-                    "messages": {
-                        "type": "array",
-                        "description": "List of chat messages with roles and content.",
-                        "items": {
-                            "type": "object",
-                            "properties": {
-                                "role": {"type": "string"},
-                                "content": {"type": "string"},
-                            },
-                            "required": ["role", "content"],
-                            "additionalProperties": False,
-                        },
-                    }
-                },
-                "required": ["messages"],
-                "additionalProperties": False,
-            },
-            "strict": True,
-        },
-    },
-]
 
 
 def call_function(name: str, args: dict[str, str | float]) -> str | float:
@@ -138,10 +90,7 @@ def summarize_session(messages: list[dict]) -> str:
     )
 
     summary_prompt = [
-        {
-            "role": "system",
-            "content": "You are a helpful assistant that summarizes conversations. Provide a concise summary highlighting only the key points discussed.",
-        },
+        {"role": "system", "content": system_prompt_summarize},
         {
             "role": "user",
             "content": f"Summarize the following conversation:\n\n{conversation_text}",

@@ -2,9 +2,11 @@ import json
 
 from openai import OpenAI
 from rich.console import Console
+from rich.live import Live
+from rich.text import Text
 
 from chat_session import ChatSession
-from tools import call_function, tools
+from tools import call_function
 
 
 def stream_assistant_response(
@@ -27,8 +29,6 @@ def stream_assistant_response(
     Returns:
         tuple: Full assistant reply (str) and any tool calls (dict).
     """
-    from rich.live import Live
-    from rich.text import Text
 
     stream = client.chat.completions.create(
         model=model_name, messages=messages, tools=tools, stream=True
