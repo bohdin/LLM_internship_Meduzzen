@@ -6,7 +6,7 @@ from dotenv import load_dotenv
 from rich.console import Console
 
 from chat_session import ChatSession
-from tools import tools
+from tools_list import tools
 from utils import handle_tool_call, stream_assistant_response
 from vector_store import VectorStore
 

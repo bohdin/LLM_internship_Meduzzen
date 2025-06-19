@@ -4,7 +4,6 @@ import openai
 from dotenv import load_dotenv
 
 from prompts import system_prompt_summarize
-from tools_list import tools
 from vector_store import VectorStore
 
 load_dotenv()
