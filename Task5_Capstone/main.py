@@ -26,7 +26,7 @@ args = parser.parse_args()
 console = Console()
 
 
-def main():
+def main() -> None:
     assistant_behavior = args.persona
     system_prompt = (
         f"You are {assistant_behavior} assistant" if assistant_behavior else None
