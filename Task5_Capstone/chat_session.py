@@ -32,7 +32,7 @@ class ChatSession:
         message = {
             "role": role,
             "content": content,
-            "tokens_used": ChatSession.count_tokens_per_message(content),
+            "tokens_used": self.count_tokens_per_message(content),
             "timestamp": datetime.now(timezone.utc).isoformat(),
         }
 
@@ -44,8 +44,7 @@ class ChatSession:
 
         self.messages.append(message)
 
-    @staticmethod
-    def count_tokens_per_message(content: str) -> int:
+    def count_tokens_per_message(self, content: str) -> int:
         """
         Count tokens for message text.
 
