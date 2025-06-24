@@ -4,6 +4,15 @@ from datetime import datetime
 
 
 def extract_json(text: str) -> str | None:
+    """
+    Extracts the JSON object from a string.
+
+    Args:
+        text (str): The input text that may contain a JSON.
+
+    Returns:
+        str | None: The extracted JSON string if found, otherwise None.
+    """
     regex_1 = r"```json\s*(\{.*?\})\s*```"
     code_block = re.search(regex_1, text, re.DOTALL)
 
@@ -19,6 +28,16 @@ def extract_json(text: str) -> str | None:
 
 
 def validate_responses(response: str, expected: dict) -> bool:
+    """
+    Validates the structure and content of a JSON response.
+
+    Args:
+        response (str): The model's output.
+        expected (dict): A dictionary with expected counts for each key.
+
+    Returns:
+        bool: True if the response is valid, False otherwise.
+    """
     try:
         json_str = extract_json(response)
         data = json.loads(json_str)
