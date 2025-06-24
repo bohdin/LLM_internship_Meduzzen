@@ -1,0 +1,72 @@
+description: Extraction prompts
+
+prompts:
+  - |-
+    Extract person names, dates, and places from the text below.
+    {{text}}
+
+  - |-
+    Return a JSON with keys: person_names, dates, locations. Extract entities from this text.
+    {{text}}
+
+  - |-
+    Extract all person names (just names), dates (YYYY-MM-DD), and all locations mentioned in the text. Return JSON with those 3 fields: person_names, dates, locations
+    {{text}}
+
+  - |-
+    From the text below, extract:
+    {"person_names": [], "dates": [], "locations": []}
+    Example: Text: Bohdan Tsviliy spoke at the conference in Kyiv on June 15, 2025 and again on 2025-06-17 in Berlin.
+    Output: {"person_names": ["Bohdan Tsviliy"], "dates": ["2025-06-15", "2025-06-17"], "locations": ["Kyiv", "Berlin"]}
+    {{text}}
+
+  - |-
+    You are an information extraction tool that returns data only in JSON format with this structure:
+    {"person_names": [], "dates": [], "locations": []}.
+    Make sure all dates are in YYYY-MM-DD. Include all names and places mentioned. Do not return extra explanation. Output only valid JSON.
+    Extract entities from the following text:
+    {{text}}
+
+providers:
+  - openai:gpt-4o
+
+tests:
+  - name: Test 1
+    vars:
+      text: In a recent conference in Tokyo on March 12, 2025, Prime Minister Fumio Kishida outlined Japan's plan for sustainable growth. He later visited Kyoto on 2025-03-15. Meanwhile, António Guterres attended a UN event in New York on 2nd April 2025.
+  
+    assert:
+      - type: llm-rubric
+        value: >
+          Verify that JSON output contains:
+          - person_names: "Fumio Kishida", "António Guterres"
+          - dates: "2025-03-12", "2025-03-15", "2025-04-02"
+          - locations: "Tokyo", "Kyoto", "New York"
+
+          Output can include extra text but must contain a valid JSON with these entities. Date format must be 'YYYY-MM-DD'.
+
+  - name: Test 2
+    vars:
+      text: "On 15th August 2020, Elon Musk announced a new project in Los Angeles. The meeting with Tim Cook was held on 2020-08-16."
+    assert:
+      - type: llm-rubric
+        value: >
+          Verify that JSON output contains:
+          - person_names: "Elon Musk", "Tim Cook"
+          - dates: "2020-08-15", "2020-08-16"
+          - locations: "Los Angeles"
+
+          Output can include extra text but must contain a valid JSON with these entities. Date format must be 'YYYY-MM-DD'.
+
+  - name: Test 3
+    vars:
+      text: "John Doe spoke about technology advancements."
+    assert:
+      - type: llm-rubric
+        value: >
+          Verify that JSON output contains:
+          - person_names: "John Doe"
+          - dates: empty list
+          - locations: empty list
+
+          Output can include extra text but must contain a valid JSON with these entities. Date format must be 'YYYY-MM-DD'.
