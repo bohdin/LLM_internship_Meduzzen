@@ -2,7 +2,7 @@ from typing import AsyncIterator
 
 from langchain.agents import AgentType, initialize_agent
 from langchain.callbacks.streaming_aiter import AsyncIteratorCallbackHandler
-from langchain.memory import ConversationBufferWindowMemory
+from langchain.memory import ConversationBufferMemory
 from langchain_openai import ChatOpenAI
 
 from tools import tools
@@ -14,11 +14,10 @@ class StreamingAgent:
         self.llm = ChatOpenAI(
             model=model_name, api_key=api_key, streaming=True, callbacks=[self.callback]
         )
-        self.memory = ConversationBufferWindowMemory(
+        self.memory = ConversationBufferMemory(
             memory_key="chat_history",
             return_messages=True,
             output_key="output",
-            k=memory_k,
         )
         self.agent = initialize_agent(
             tools=tools,

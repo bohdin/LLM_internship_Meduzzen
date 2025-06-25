@@ -3,7 +3,7 @@
 ## Features
 
 - **WebSocket Streaming**: WebSocket streaming responses from LangChain conversational agent
-- **Conversation Memory**: Full conversation memory with windowed context
+- **Conversation Memory**: Full conversation memory
 - **React Frontend**: React frontend with real-time chat UI
 - **Health Check Endpoint**: Backend health check endpoint `/health`
 - **Integrated Tools**: Tools integrated in LangChain agent

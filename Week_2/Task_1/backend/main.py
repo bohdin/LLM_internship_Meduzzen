@@ -28,9 +28,9 @@ async def health() -> dict[str, str]:
 async def stream_endpoint(websocket: WebSocket) -> None:
     """
     WebSocket endpoint for streaming agent responses.
-    
+
     Receives user input text and streams back chunks of the agent's response.
-    
+
     Args:
         websocket (WebSocket): WebSocket connection.
     """
