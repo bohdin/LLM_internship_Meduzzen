@@ -1,32 +1,23 @@
-from pydantic import BaseModel, Field
-from langchain.tools import Tool
-from langchain_core.tools import tool
-import random
 import json
+import random
 
 import wikipedia
+from langchain.tools import Tool
 
-class RectangleInput(BaseModel):
-    height: float = Field(..., description="Height of the rectangle")
-    width: float = Field(..., description="Width of the rectangle")
 
 def calculate_area_rectangle(json_input: str) -> float:
     """
-    Calculate the area of a rectangle.
+    Calculate the area of a rectangle from a JSON string.
 
     Args:
-        height (float): Height of the rectangle.
-        width (float): Width of the rectangle.
+        json_input (str): A JSON string with keys "height" and "width".
 
     Returns:
-        float: An area of rectangle.
+        float: The calculated area of the rectangle.
     """
     data = json.loads(json_input)
-    height = data.get("height")
-    width = data.get("width")
-
-    if height is None or width is None:
-        return "Error: please provide 'height' and 'width' fields."
+    height = float(data.get("height"))
+    width = float(data.get("width"))
 
     return height * width
 
@@ -42,9 +33,10 @@ def search_wikipedia(query: str) -> str:
         str: A summary related to the query.
     """
     try:
-        return wikipedia.summary(query, sentences = 2)
+        return wikipedia.summary(query, sentences=2)
     except wikipedia.exceptions.PageError:
         return "Page not found"
+
 
 def get_weather(location: str) -> float:
     """
@@ -68,11 +60,11 @@ tools = [
     Tool.from_function(
         func=search_wikipedia,
         name="search_wikipedia",
-        description="Search information by given query."
+        description="Search information by given query.",
     ),
     Tool.from_function(
         func=get_weather,
         name="get_weather",
-        description="Get current temperature for a given location."
+        description="Get current temperature for a given location.",
     ),
 ]
