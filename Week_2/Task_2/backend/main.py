@@ -5,6 +5,7 @@ from dotenv import load_dotenv
 from fastapi import FastAPI, File, UploadFile, WebSocket, WebSocketDisconnect
 
 from agent import StreamingAgent
+from utils import run_and_send
 from vector_store import VectorStore
 
 load_dotenv()
@@ -64,18 +65,16 @@ async def stream_endpoint(websocket: WebSocket) -> None:
 
     try:
         while True:
-            msg = await websocket.receive_text()
+            user_input = await websocket.receive_text()
 
-            if msg == "__STOP__":
+            if user_input == "__STOP__":
                 if current_task and not current_task.done():
                     current_task.cancel()
                 continue
 
-            async def run_and_send():
-                async for chunk in agent.run_stream(msg):
-                    await websocket.send_text(chunk)
-
-            current_task = asyncio.create_task(run_and_send())
+            current_task = asyncio.create_task(
+                run_and_send(agent, websocket, user_input)
+            )
 
     except WebSocketDisconnect:
         if current_task and not current_task.done():
