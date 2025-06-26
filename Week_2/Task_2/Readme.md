@@ -52,6 +52,9 @@ App work
 
 ![GIF](screenshots/work.gif)
 
+![screenshot](screenshots/app.png)
+
+
 Results of add document
 ![screenshot](screenshots/add_document.png)
 
