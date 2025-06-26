@@ -50,7 +50,7 @@ npm run dev
 
 App work
 
-![screenshot](screenshots/app.png)
+![GIF](screenshots/work.gif)
 
 Results of add document
 ![screenshot](screenshots/add_document.png)
