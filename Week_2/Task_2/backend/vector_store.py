@@ -54,7 +54,13 @@ class VectorStore:
         """
         docs = TextLoader(file_path, encoding="utf-8").load()
         chunks = self._split_docs(docs)
-        vectorstore = FAISS.from_documents(chunks, self.embeddings)
+        index_path = os.path.join(self.data_dir, "index.faiss")
+        if os.path.exists(index_path):
+            vectorstore = self._load()
+            vectorstore.add_documents(chunks)
+        else:
+            vectorstore = FAISS.from_documents(chunks, self.embeddings)
+
         vectorstore.save_local(str(self.data_dir))
 
     def get_chain(self, api_key: str, model_name: str = "gpt-4o") -> RetrievalQA:

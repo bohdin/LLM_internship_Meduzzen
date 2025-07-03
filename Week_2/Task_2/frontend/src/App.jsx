@@ -16,7 +16,12 @@ function App() {
     socketRef.current.onmessage = (event) => {
       const chunk = event.data;
 
-      if (chunk.includes("[response interrupted]") || chunk.includes("[previous response cancelled]")) {
+      if (
+        chunk.includes("[response interrupted]") || 
+        chunk.includes("[previous response cancelled]") ||
+        chunk.includes("[DONE]")
+      ) {
+        console.log("Received chunk:", chunk);
         setIsStreaming(false);
         return; // не додаємо це у повідомлення
       }
@@ -58,6 +63,7 @@ function App() {
   }, []);
 
   const sendMessage = () => {
+    console.log(input);
     if (!input.trim()) return;
     if (socketRef.current?.readyState !== WebSocket.OPEN) {
       console.warn('WebSocket is not open');

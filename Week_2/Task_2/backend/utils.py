@@ -14,3 +14,4 @@ async def run_and_send(agent: StreamingAgent, websocket: WebSocket, msg: str) ->
     """
     async for chunk in agent.run_stream(msg):
         await websocket.send_text(chunk)
+    await websocket.send_text("[DONE]")
