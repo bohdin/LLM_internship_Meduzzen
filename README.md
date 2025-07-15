@@ -48,12 +48,12 @@ Frontend: `week_2/Task_2/frontend`
 
 ## Screenshots
 
-![cli_screenshot](Task5_Capstone\screenshots\cli.png)
+![cli_screenshot](Task5_Capstone/screenshots/cli.png)
 
-![prompt_screenshot](Task_6\screenshots\CLI.png)
+![prompt_screenshot](Task_6/screenshots/CLI.png)
 
-![promptfoo_screenshot](Task_6\screenshots\promptfoo_1.png)
+![promptfoo_screenshot](Task_6/screenshots/promptfoo_1.png)
 
-![web_screenshot](Week_2\Task_2\screenshots\app.png)
+![web_screenshot](Week_2/Task_2/screenshots/app.png)
 
-![smith_screenshot](Week_2\Task_2\screenshots\smith.png)
+![smith_screenshot](Week_2/Task_2/screenshots/smith.png)
